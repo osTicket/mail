@@ -1,0 +1,43 @@
+{
+    "name": "osticket/mail",
+    "description": "Framework-agnostic mail engine for osTicket 2.0 (RFC message build, transports, fetch, parsing).",
+    "type": "library",
+    "version": "0.1.0",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "JediKev",
+            "email": "kevin@osticket.com",
+            "homepage": "https://github.com/jedikev",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Osticket\\Mail\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Osticket\\Mail\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "symfony/mime": "^7.4",
+        "symfony/mailer": "^7.4",
+        "webklex/php-imap": "^6.2",
+        "zbateson/mail-mime-parser": "^3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5",
+        "phpstan/phpstan": "^1.11"
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test-integration": "phpunit --testsuite Integration",
+        "stan": "phpstan analyse"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
