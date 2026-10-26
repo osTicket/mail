@@ -12,6 +12,7 @@ use Osticket\Mail\Support\Envelope;
 use Osticket\Mail\Support\Attachment;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
+use ReflectionNamedType;
 
 final class ExtensionContractSignaturesTest extends TestCase
 {
@@ -23,8 +24,8 @@ final class ExtensionContractSignaturesTest extends TestCase
         self::assertSame(2, $m->getNumberOfParameters());
         self::assertSame(1, $m->getNumberOfRequiredParameters());
 
-        self::assertSame(Message::class, $m->getParameters()[0]->getType()?->getName());
-        self::assertSame('array', $m->getParameters()[1]->getType()?->getName());
+        self::assertSame(Message::class, $this->parameterTypeName($m, 0));
+        self::assertSame('array', $this->parameterTypeName($m, 1));
     }
 
     public function test_dmarc_validator_signature_is_stable(): void
@@ -34,9 +35,9 @@ final class ExtensionContractSignaturesTest extends TestCase
         self::assertSame(3, $m->getNumberOfParameters());
         self::assertSame(2, $m->getNumberOfRequiredParameters());
 
-        self::assertSame(Message::class, $m->getParameters()[0]->getType()?->getName());
-        self::assertSame(Envelope::class, $m->getParameters()[1]->getType()?->getName());
-        self::assertSame('array', $m->getParameters()[2]->getType()?->getName());
+        self::assertSame(Message::class, $this->parameterTypeName($m, 0));
+        self::assertSame(Envelope::class, $this->parameterTypeName($m, 1));
+        self::assertSame('array', $this->parameterTypeName($m, 2));
     }
 
     public function test_attachment_scanner_signature_is_stable(): void
@@ -46,11 +47,19 @@ final class ExtensionContractSignaturesTest extends TestCase
         self::assertSame(2, $m->getNumberOfParameters());
         self::assertSame(1, $m->getNumberOfRequiredParameters());
 
-        self::assertSame('array', $m->getParameters()[0]->getType()?->getName());
-        self::assertSame('array', $m->getParameters()[1]->getType()?->getName());
+        self::assertSame('array', $this->parameterTypeName($m, 0));
+        self::assertSame('array', $this->parameterTypeName($m, 1));
 
         // Ensure the doc expects attachments (not enforced by runtime, but we can at least ensure interface exists).
         self::assertTrue(\interface_exists(AttachmentScannerInterface::class));
         self::assertTrue(\class_exists(Attachment::class));
+    }
+
+    private function parameterTypeName(ReflectionMethod $method, int $index): string
+    {
+        $type = $method->getParameters()[$index]->getType();
+        self::assertInstanceOf(ReflectionNamedType::class, $type);
+
+        return $type->getName();
     }
 }

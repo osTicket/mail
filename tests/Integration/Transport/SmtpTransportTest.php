@@ -226,8 +226,10 @@ final class FakeSmtpServer
 {
     private string $scriptPath;
     private string $transcriptPath;
+    /** @var resource */
     private $proc;
-    private $pipes;
+    /** @var array<int, resource> */
+    private array $pipes;
     private int $port;
 
     /**

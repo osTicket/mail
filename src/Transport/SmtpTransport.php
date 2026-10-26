@@ -16,6 +16,7 @@ use Osticket\Mail\Transport\Exceptions\TransportException;
 use Symfony\Component\Mailer\Envelope as SymfonyEnvelope;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
+use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 use Symfony\Component\Mailer\Transport\Smtp\Auth\XOAuth2Authenticator;
 use Symfony\Component\Mime\{Address, RawMessage};
 use Throwable;
@@ -179,6 +180,10 @@ final class SmtpTransport implements TransportContract
     {
         $tls = ($this->encryption === 'ssl');
         $transport = new EsmtpTransport($this->host, $this->port, $tls);
+        $stream = $transport->getStream();
+        if ($stream instanceof SocketStream) {
+            $stream->setTimeout($this->timeoutSeconds);
+        }
 
         if ($this->credentials instanceof PasswordCredentials) {
             $transport->setUsername($this->credentials->username());

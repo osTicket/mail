@@ -9,9 +9,25 @@ use Osticket\Mail\Auth\Credentials\{PasswordCredentials, XOAuth2Credentials};
 use Osticket\Mail\Fetch\{FetchDisposition, ImapFetcher, RawMessage};
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
+use Webklex\PHPIMAP\Message as WebklexMessage;
 
 final class ImapFetcherTest extends TestCase
 {
+    public function test_raw_message_retains_the_provider_date_attribute(): void
+    {
+        $message = WebklexMessage::fromString(
+            "Date: Mon, 26 Oct 2026 12:34:56 +0300\r\nSubject: Date fixture\r\n\r\nBody"
+        );
+        $convert = new ReflectionMethod(ImapFetcher::class, 'toRawMessage');
+        $raw = $convert->invoke(new ImapFetcher('imap.example.com'), $message, 'INBOX', 123);
+
+        self::assertInstanceOf(RawMessage::class, $raw);
+        $receivedAt = $raw->receivedAt();
+        self::assertNotNull($receivedAt);
+        self::assertSame('2026-10-26T12:34:56+03:00', $receivedAt->format(DATE_ATOM));
+    }
+
     public function test_it_accepts_password_credentials(): void
     {
         $fetcher = new ImapFetcher(

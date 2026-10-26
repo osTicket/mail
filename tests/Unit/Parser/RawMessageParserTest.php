@@ -8,9 +8,31 @@ use Osticket\Mail\Exceptions\ParseException;
 use Osticket\Mail\Fetch\RawMessage;
 use Osticket\Mail\Parser\RawMessageParser;
 use PHPUnit\Framework\TestCase;
+use Osticket\Mail\Parser\ParsedAttachment;
+use ReflectionMethod;
+use ZBateson\MailMimeParser\IMessage;
+use ZBateson\MailMimeParser\Message\IMessagePart;
 
 final class RawMessageParserTest extends TestCase
 {
+    public function test_attachment_without_a_content_type_uses_the_binary_default(): void
+    {
+        $part = $this->createMock(IMessagePart::class);
+        $part->method('getContentType')->willReturn(null);
+        $part->method('getContent')->willReturn('Attachment body');
+        $message = $this->createMock(IMessage::class);
+        $message->method('getAllAttachmentParts')->willReturn([$part]);
+
+        $extract = new ReflectionMethod(RawMessageParser::class, 'extractAttachments');
+        $attachments = $extract->invoke(new RawMessageParser(), $message);
+
+        self::assertIsArray($attachments);
+        self::assertCount(1, $attachments);
+        self::assertInstanceOf(ParsedAttachment::class, $attachments[0]);
+        self::assertSame('application/octet-stream', $attachments[0]->contentType());
+        self::assertSame('Attachment body', $attachments[0]->content());
+    }
+
     public function test_it_parses_simple_text_message(): void
     {
         $parser = new RawMessageParser();

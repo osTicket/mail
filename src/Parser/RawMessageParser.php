@@ -104,7 +104,7 @@ final class RawMessageParser
 
             $attachments[] = new ParsedAttachment(
                 filename: $part->getFilename(),
-                contentType: $part->getContentType('application/octet-stream'),
+                contentType: $part->getContentType('application/octet-stream') ?? 'application/octet-stream',
                 content: $this->readAttachmentContent($part),
                 contentId: $part->getContentId(),
                 disposition: $part->getContentDisposition(),

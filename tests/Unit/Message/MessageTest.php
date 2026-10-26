@@ -15,6 +15,7 @@ use Osticket\Mail\Support\{
 };
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\AbstractMultipartPart;
 
 final class MessageTest extends TestCase
 {
@@ -63,10 +64,9 @@ final class MessageTest extends TestCase
             ->setSubject('Hi')
             ->setMessageId($id);
 
-        $this->assertSame(
-            '<123@example.com>',
-            $msg->email()->getHeaders()->get('Message-ID')->getBodyAsString()
-        );
+        $header = $msg->email()->getHeaders()->get('Message-ID');
+        self::assertNotNull($header);
+        $this->assertSame('<123@example.com>', $header->getBodyAsString());
     }
 
     public function test_message_is_immutable(): void
@@ -182,7 +182,9 @@ final class MessageTest extends TestCase
 
         $email = $msg->email();
 
-        $parts = iterator_to_array($email->getBody()->getParts());
+        $body = $email->getBody();
+        self::assertInstanceOf(AbstractMultipartPart::class, $body);
+        $parts = iterator_to_array($body->getParts());
 
         $found = false;
         foreach ($parts as $part) {
@@ -307,9 +309,8 @@ final class MessageTest extends TestCase
             'B12345'
         );
 
-        $this->assertSame(
-            '<B12345@example.com>',
-            $msg->email()->getHeaders()->get('Message-ID')->getBodyAsString()
-        );
+        $header = $msg->email()->getHeaders()->get('Message-ID');
+        self::assertNotNull($header);
+        $this->assertSame('<B12345@example.com>', $header->getBodyAsString());
     }
 }

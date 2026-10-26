@@ -15,6 +15,7 @@ use Osticket\Mail\Exceptions\{
     FetchException
 };
 use Throwable;
+use Webklex\PHPIMAP\Attribute;
 use Webklex\PHPIMAP\Client as WebklexClient;
 use Webklex\PHPIMAP\ClientManager;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException as WebklexAuthFailedException;
@@ -861,7 +862,7 @@ final class ImapFetcher
     private function messageSize(WebklexMessage $message): ?int
     {
         try {
-            $size = $message->size ?? null;
+            $size = $message->get('size');
 
             if (\is_int($size)) {
                 return $size;
@@ -886,7 +887,11 @@ final class ImapFetcher
     private function messageReceivedAt(WebklexMessage $message): ?DateTimeImmutable
     {
         try {
-            $date = $message->date ?? null;
+            $date = $message->get('date');
+
+            if ($date instanceof Attribute) {
+                $date = $date->first();
+            }
 
             if ($date instanceof DateTimeImmutable) {
                 return $date;

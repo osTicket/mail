@@ -56,10 +56,9 @@ final class MessageRenderingTest extends TestCase
 
     private function headerLine(string $rfc, string $headerName): string
     {
-        self::assertSame(
-            1,
-            \preg_match('/^' . \preg_quote($headerName, '/') . ': .*$/m', $rfc, $matches)
-        );
+        if (\preg_match('/^' . \preg_quote($headerName, '/') . ': .*$/m', $rfc, $matches) !== 1) {
+            self::fail('Missing ' . $headerName . ' header.');
+        }
 
         return $matches[0];
     }

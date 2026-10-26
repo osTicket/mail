@@ -2,7 +2,6 @@
     "name": "osticket/mail",
     "description": "Framework-agnostic mail engine for osTicket 2.0 (RFC message build, transports, fetch, parsing).",
     "type": "library",
-    "version": "0.1.0",
     "license": "MIT",
     "authors": [
         {

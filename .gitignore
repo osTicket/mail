@@ -30,3 +30,6 @@ composer.lock
 
 # Ignore live IMAP env file
 .env.live-imap
+
+# Local static-analysis cache
+/.phpstan-cache/

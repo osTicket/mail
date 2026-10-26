@@ -11,9 +11,23 @@ use Osticket\Mail\Transport\Exceptions\TransportException;
 use Osticket\Mail\Transport\SmtpTransport;
 use Osticket\Mail\Transport\SendmailTransport;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
+use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
+use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 
 final class TransportGuardsTest extends TestCase
 {
+    public function test_smtp_applies_the_configured_socket_timeout(): void
+    {
+        $factory = new ReflectionMethod(SmtpTransport::class, 'createTransport');
+        $transport = $factory->invoke(new SmtpTransport('smtp.example.com', timeoutSeconds: 11));
+
+        self::assertInstanceOf(EsmtpTransport::class, $transport);
+        $stream = $transport->getStream();
+        self::assertInstanceOf(SocketStream::class, $stream);
+        self::assertSame(11.0, $stream->getTimeout());
+    }
+
     public function test_smtp_throws_on_empty_rfc822(): void
     {
         $t = new SmtpTransport('127.0.0.1', 25);

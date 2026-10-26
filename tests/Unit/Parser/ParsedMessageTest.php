@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use Osticket\Mail\Parser\ParsedAttachment;
 use Osticket\Mail\Parser\ParsedMessage;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 final class ParsedMessageTest extends TestCase
 {
@@ -58,7 +59,8 @@ final class ParsedMessageTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('header values');
 
-        new ParsedMessage(['X-Test' => [123]]);
+        // Reflection allows deliberately invalid generic array contents through the test boundary.
+        (new ReflectionClass(ParsedMessage::class))->newInstanceArgs([['X-Test' => [123]]]);
     }
 
     public function test_it_rejects_non_attachment_values(): void
@@ -66,6 +68,7 @@ final class ParsedMessageTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('attachments');
 
-        new ParsedMessage(attachments: ['not an attachment']);
+        // Keep the public PHPDoc contract strict while exercising its runtime validation.
+        (new ReflectionClass(ParsedMessage::class))->newInstanceArgs(['attachments' => ['not an attachment']]);
     }
 }

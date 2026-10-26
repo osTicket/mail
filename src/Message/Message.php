@@ -627,6 +627,7 @@ final class Message
      *
      * @throws MailException
      * @throws InvalidArgumentException When no From address is set.
+     * @phpstan-assert !null $this->messageId
      */
     private function ensureMessageIdAssigned(): void
     {
